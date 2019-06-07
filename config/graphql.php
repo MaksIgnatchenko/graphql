@@ -103,6 +103,7 @@ return [
             'query' => [
                 'users' => UserQuery::class,
                 'userById' => \App\GraphQL\Query\UserByIdQuery::class,
+                'posts' => \App\GraphQL\Query\PostQuery::class,
             ],
             'mutation' => [
                 'updateUserName' => \App\GraphQL\Mutation\UpdateUserNameMutation::class,

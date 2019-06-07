@@ -10,36 +10,37 @@
                                 <img class="d-flex mr-3 rounded-circle img-thumbnail thumb-lg" v-bind:src="avatar"
                                      alt="Generic placeholder image">
                                 <div class="media-body">
-                                    <h5 class="mt-0 font-18 mb-1">{{ name }}</h5>
-                                    <h6 class="font-14"><i class="ion-email"></i> {{ email }}</h6>
-                                    <h6 class="font-14"><i class="ion-iphone"></i> {{ phone }}</h6>
+                                    <h5 class="mt-0 font-18 mb-1">{{ user.name }}</h5>
+                                    <h6 class="font-14"><i class="ion-email"></i> {{ user.email }}</h6>
+                                    <h6 class="font-14"><i class="ion-iphone"></i> {{ user.phone }}</h6>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-block">
-                            <div class="row">
-                                <ul class="nav nav-tabs">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#">Info</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Friends ({{ friendsCount }})</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Posts ({{ postsCount }})</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card-block">
-                            <div class="row">
-                                <div class="col-md-4">Date of Birth</div>
-                                <div class="col-md-8">{{ birthday }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">Country</div>
-                                <div class="col-md-8">{{ country }}</div>
-                            </div>
+                        <div>
+                            <b-tabs content-class="mt-3">
+                                <b-tab title="Info">
+                                    <div class="card-block">
+                                        <div class="tab-content">
+                                            <div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Date of Birth</div>
+                                                    <div class="col-md-8">{{ user.birthday }}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Country</div>
+                                                    <div class="col-md-8">{{ user.country }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </b-tab>
+                                <b-tab :title="'Friends (' + user.friends_count + ')'"><p>I'm the second tab</p></b-tab>
+                                <b-tab :title="'Posts (' + user.posts_count + ')'">
+                                    <div v-for="post in posts">
+                                        <post-thumbnail v-bind:post="post"></post-thumbnail>
+                                    </div>
+                                </b-tab>
+                            </b-tabs>
                         </div>
                     </div>
                 </div>
@@ -49,23 +50,55 @@
 </template>
 
 <script>
+    import PostThumbnail from '../components/PostThumbnail.vue';
     export default {
+        components: {
+            postThumbnail: PostThumbnail
+        },
         props: [
             'user',
         ],
-
-        data() {
+        data: function() {
             return {
-                avatar: this.user.avatar,
-                name: this.user.name,
-                email: this.user.email,
-                phone: this.user.phone,
-                birthday: this.user.birthday,
-                country: this.user.country,
-                friendsCount: this.user.friendsCount,
-                postsCount: this.user.postsCount,
+                defaultAvatar: 'http://localhost/images/user.png',
+                posts: this.getPosts(),
             }
         },
-
+        methods: {
+            getPosts: function () {
+                var profile = this;
+                var vm = this.$root;
+                axios.post(vm.baseApi, {
+                    query: `
+                    query {
+                        posts(user_id: "1") {
+                            id,
+                            picture,
+                            title,
+                            body
+                        }
+                    }`
+                }).then(function (response) {
+                    profile.posts = response.data.data.posts;
+                })
+                .catch(function (error) {
+                    profile.posts = 'error';
+                })
+            }
+        },
+        // mounted: function() {
+        //     this.posts = this.getPosts();
+        // },
+        computed: {
+            avatar: function() {
+                return this.user.avatar ? this.user.avatar : this.defaultAvatar;
+            },
+            selectedMeTab: function() {
+                return this.$root.$data.selectedMeTab;
+            },
+            // posts: function() {
+            //     return this.getPosts();
+            // }
+        }
     }
 </script>

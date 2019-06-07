@@ -13,40 +13,64 @@ const app = new Vue({
     components: {
         profile: Profile,
     },
-    data: {
-        // me : {
-        //     avatar: 'https://tagit.appus.work/storage/avatars/BzCaqqkccmIVZX57RA3auMLUbwDccrkCNG3sf9jY.jpeg',
-        //     name: 'Max',
-        //     email: 'post@gmail.com',
-        //     phone: '+380501231231',
-        //     birthday: '1989-06-27',
-        //     country: 'Ukraine',
-        //     friendsCount: 10,
-        //     postsCount: 3,
-        // }
+    data() {
+        return {
+            baseApi : 'http://localhost/graphql',
+            me : {},
+            posts : [],
+            selectedMeTab : 'info',
+        };
+    },
+
+    created: function() {
+        this.getMe();
     },
 
     methods: {
-        getMe() {
-
-            async getChampionByName () {
-                const res = await axios.post(
-                    'http://localhost:4000/graphql', {
-                        query: `
-                            query GetChampionByName($championName: String!) {
-                            getChampionByName(name: $championName) {
-                            name
-                            attackDamage
+        getMe: function() {
+            var vm = this;
+            axios.post(vm.baseApi, {
+                query: `
+                    query {
+                        userById(id: 1) {
+                            name,
+                            email,
+                            phone,
+                            avatar,
+                            birthday,
+                            country,
+                            friends_count,
+                            posts_count    
                         }
-                    }`,
-                        variables: {
-                            championName: 'Ashe'
-                        }
-                    })
-                this.champion = res.data.data.getChampionByName
-            }
+                    }`
+            }).then(function (response) {
+                vm.me = response.data.data.userById;
+            })
+            .catch(function (error) {
+                vm.me = 'error';
+            })
+        },
 
-        }
+        // getPosts: function () {
+        //     var vm = this;
+        //     axios.post(vm.baseApi, {
+        //         query: `
+        //             query {
+        //                 posts(user_id: "1") {
+        //                     id,
+        //                     picture,
+        //                     title,
+        //                     body
+        //                   }
+        //                 }
+        //             }`
+        //     }).then(function (response) {
+        //         return response.data.data.posts;
+        //     })
+        //     .catch(function (error) {
+        //         return 'error';
+        //     })
+        // }
     }
 });
 

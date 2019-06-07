@@ -6,35 +6,35 @@
 
 namespace App\GraphQL\Query;
 
-use App\Models\User;
+use App\Models\Post;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 
-class UserByIdQuery extends Query
+class PostQuery extends Query
 {
     protected $attributes = [
-        'name' => 'userById'
+        'name' => 'Posts query'
     ];
 
     public function type()
     {
-        return GraphQL::type('user');
+        return Type::listOf(GraphQL::type('post'));
     }
 
     public function args()
     {
         return [
-            'id' => [
-                'name' => 'id',
-                'type' => Type::nonNull(Type::int()),
-                'rules' => ['required'],
-            ],
+            'user_id' => ['name' => 'user_id', 'type' => Type::string()],
         ];
     }
 
     public function resolve($root, $args)
     {
-        return User::withCount(['friends', 'posts'])->findOrfail($args['id']);
+        if (isset($args['user_id'])) {
+            return Post::where('user_id' , $args['user_id'])->get();
+        }
+
+        return Post::all();
     }
 }

@@ -25,6 +25,14 @@ class PostType extends GraphQLType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'The id of the post',
             ],
+            'picture' => [
+                'type' => Type::string(),
+                'description' => 'a picture url of the post',
+            ],
+            'title' => [
+                'type' => Type::string(),
+                'description' => 'a title of the post',
+            ],
             'body' => [
                 'type' => Type::string(),
                 'description' => 'a content of the post',

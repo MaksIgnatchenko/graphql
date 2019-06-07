@@ -55,6 +55,14 @@ class UserType extends GraphQLType
                 'type' => Type::listOf(GraphQL::type('post')),
                 'description' => 'The user posts'
             ],
+            'friends_count' => [
+                'type' => Type::int(),
+                'description' => 'Friends count of a user',
+            ],
+            'posts_count' => [
+                'type' => Type::int(),
+                'description' => 'Posts count of a user',
+            ],
         ];
     }
 
